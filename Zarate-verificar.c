@@ -1,8 +1,6 @@
 #include <string.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
-#include <assert.h>
 
 //Declaración de funciones relacionadas al funcionamiento del programa
 
