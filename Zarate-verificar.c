@@ -1,3 +1,5 @@
+//Aldana Zarate
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,26 +7,20 @@
 //Declaración de funciones relacionadas al funcionamiento del programa
 
 int revisarValores(int reinas[][2], int n);
-void archivoEntrada( int reinas[17][2]);
+int archivoEntrada(int reinas[][2]);
 int revisarFilas(int reinas[][2],int n);
 int revisarColumnas(int reinas[][2],int n);
 int revisarDiagonales(int reinas[][2],int n);
-int tableroCorrecto(int reinas[17][2],int n);
-
-//Declaración de funciones relacionadas al testing de las funciones
-
+void tableroCorrecto(int reinas[][2],int n, char res[]);
+void archivoSalida( char resultado[]);
 
 int main(){
-	int n,reinas[17][2];
-	printf("Ingrese la dimensión del tablero: \n");
-	scanf("%d",&n);
-	archivoEntrada(reinas);
-	//tableroCorrecto(reinas);
-	printf("%d\n",revisarValores(reinas,n));
-	printf("%d\n",revisarFilas(reinas,n));
-	printf("%d\n",revisarColumnas(reinas,n));
-	printf("%d\n",revisarDiagonales(reinas,n));
 
+	int n,reinas[17][2];
+	char res[200];
+	n=archivoEntrada(reinas);
+	tableroCorrecto(reinas,n,res);
+	archivoSalida(res);
 
 }
 
@@ -40,88 +36,100 @@ int revisarValores(int reinas[][2], int n){
 
 // revisa los valores de cada fila en búsqueda de reinas en misma fila.
 int revisarFilas(int reinas[][2],int n){
-	int valoresCorrectos = 1;
-	for(int i=0; i < (n-1) && valoresCorrectos;i++){
-		for(int j=i+1;j<n && valoresCorrectos;j++){
-		valoresCorrectos = (reinas[i][0] != reinas[j][0]);
+	int filasCorrectas = 1;
+	for(int i=0; i < (n-1) && filasCorrectas;i++){
+		for(int j=i+1;j<n && filasCorrectas;j++){
+		filasCorrectas = (reinas[i][0] != reinas[j][0]);
 		}
 	}
-	return valoresCorrectos;	
+	return filasCorrectas;	
 }
 
 // Similar a revisarFila(), pero controlando las columnas.
 int revisarColumnas(int reinas[][2],int n){
-	int valoresCorrectos = 1;
-	for(int i=0; i < (n-1) && valoresCorrectos;i++){
-		for(int j=i+1;j<n && valoresCorrectos;j++){
-		valoresCorrectos = (reinas[i][1] != reinas[j][1]);
+	int columnasCorrectas = 1;
+	for(int i=0; i < (n-1) && columnasCorrectas;i++){
+		for(int j=i+1;j<n && columnasCorrectas;j++){
+		columnasCorrectas = (reinas[i][1] != reinas[j][1]);
 		}
 	}
-	return valoresCorrectos;
+	return columnasCorrectas;
 }
 
 // Similar a revisarFila(), pero controlando los diagonales.
 int revisarDiagonales(int reinas[][2],int n){
-	int valoresCorrectos = 1;
-	for(int i=0; i < (n-1) && valoresCorrectos;i++){
-		for(int j=i+1;j<n && valoresCorrectos;j++){
-		valoresCorrectos = ((reinas[i][0]+reinas[i][1]) != (reinas[j][0]+reinas[j][1]) || (reinas[i][0]-reinas[i][1]) != (reinas[j][0]-reinas[j][1]));
+	int diagonalesCorrectas = 1;
+	for(int i=0; i < (n-1) && diagonalesCorrectas;i++){
+		for(int j=i+1;j<n && diagonalesCorrectas;j++){
+			diagonalesCorrectas = ((reinas[i][0]+reinas[i][1]) != (reinas[j][0]+reinas[j][1]) && (reinas[i][0]-reinas[i][1]) != (reinas[j][0]-reinas[j][1]));
 		}
 	}
-	return valoresCorrectos;
+	return diagonalesCorrectas;
 }
 
 //La función verifica las cuatro condiciones que debe cumplir un tablero con N reinas bien resuelto.
-int tableroCorrecto(int reinas[17][2],int n){
-	if(!revisarValores(reinas,n))
-		return 0;
-	if(!revisarFilas(reinas,n))
-		return 1;
-	if(!revisarColumnas(reinas,n))
-		return 2;
-	if(!revisarDiagonales(reinas,n))
-		return 3;
+void tableroCorrecto(int reinas[][2],int n, char res[]){
+
+	if(revisarValores(reinas,n) && revisarFilas(reinas,n) && revisarColumnas(reinas,n) && revisarDiagonales(reinas,n)){
+		strcpy(res,"El tablero es valido");
+		return;
+	}
+
+	if(!revisarValores(reinas,n)){
+		strcpy(res,"El tablero posee valores fuera de los rangos establecidos por la dimension del tablero");
+		return;
+	}
+
+	if(!revisarFilas(reinas,n)){
+		strcpy(res,"El tablero posee al menos dos reinas en una misma fila");
+		return;
+	}
+
+	if(!revisarColumnas(reinas,n)){
+		strcpy(res,"El tablero posee al menos dos reinas en una misma columna");
+		return;
+	}
+	
+	if(!revisarDiagonales(reinas,n)){
+		strcpy(res,"El tablero posee al menos dos reinas en una misma diagonal");
+		return;
+	}
+
 }
 
 
 /*
-archivoEntrada: char[] -> int
+archivoEntrada: int[][] -> void
 La función archivoEntrada toma como parámetro un array de dos dimensiones en donde serán
-almancenadas las reinas[][17] del archivo tablero.txt. La función devuelve un número entero 
-que representa la cantidad de palabras leídas en el archivo.
+almancenadas las posiciones de las reinas del archivo tablero.txt.
+Donde, en la primer dimensión indica el número de reina, y en esta, el primer elemento es la fila donde está ubicada
+y el segundo la columna.
 */
-void archivoEntrada( int reinas[17][2]){
-	//int aux[17][2];
+int archivoEntrada(int reinas[][2]){
+	int n=0;
 	FILE * fp;
-	fp = fopen("entrada.txt", "r");
-	
-	/*while (!feof(fp)){
-    fscanf(fp, "%s", linea);
-		strcpy(palabras[lineas],linea);
-		lineas++;
-	}*/
+	fp = fopen("tablero.txt", "r");
 
 	for(int i=0; !feof(fp);i++){
 		fscanf(fp,"%d %d\n",&reinas[i][0],&reinas[i][1]);
+		n++;
 	}
 	fclose(fp);
+	return n;
 }
 
 /*
-archivoSalida: int , char[] -> void
-La función archivoSalida toma como parámetro la cantidad de palabras en el array resultado
-y el array con las palabras que serán copiadas al archivo salida.txt
+archivoSalida: char[] -> void
+La función archivoSalida toma como parámetro un array de caracteres que
+representa la condición en la que se encuentra el tablero, que será copiada al archivo salida.txt
 */
-/*void archivoSalida( char resultado[][16], int cantPalabrasResultante ){
+void archivoSalida( char res[]){
 	FILE * fp;
 	fp = fopen("salida.txt", "w+");
 
-	forn( i , cantPalabrasResultante ){
-		int largoPalabra= strlen(resultado[i]);
-		resultado[i][largoPalabra]='\0';
-		fprintf(fp, "%s", resultado[i]);
-		fprintf(fp, "\n");
-	}
+	int largoPalabra= strlen(res);
+	res[largoPalabra]='\0';
+	fprintf(fp, "%s", res);
 
 	fclose(fp);
-}*/
+}
