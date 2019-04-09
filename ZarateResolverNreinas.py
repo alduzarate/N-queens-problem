@@ -18,15 +18,15 @@ Al buscar esta columna, siempre se lo hace con un i diferente, es decir, un nume
 más de 1 en una misma fila). 
 Luego, para las columnas, existe el array visitados que guarda dichas columnas que ya han sido visitadas.
 Para el chequeo de las diagonales, se puede observar que cada suma y/o resta de las diagonales es única.
-Es decir, una vez que coloco una reina en la pila de la solución, agrego la suma y resta de sus coordenadas (fila+columna)
+Es decir, una vez que coloco una reina en la solución, agrego la suma y resta de sus coordenadas (fila+columna)
 a los arrays sumas[] y restas[] respectivamete, destinados a fin de que no se coloque ninguna reina en sus respectivas diagonales.
 En caso de que el camino que se estaba siguiendo no conduce a ninguna distribución válida,
-se vuelve al estado anterior sacando de la pila el último insertado, y se prueba un nuevo camino aún no visitado.
+se vuelve al estado anterior sacando de la solución el último insertado, y se prueba un nuevo camino aún no visitado.
 Si ya se ha encontrado la única solución que deseamos, procedemos a limpiar la pila con las llamadas recursivas a la función y así retornar la lista con las columnas de
 las reinas.
 Nota: este programa está diseñado de manera que se puedan conseguir el número de soluciones que se deseen (siendo este número acotado, por supuesto, debido al ritmo de
 crecimiento del número de soluciones cuando n crece). Por ello existe la constante con el número de soluciones deseadas, de manera que así el programa para de tratar de
-conseguir soluciones aún no exploradas (si es que existen).
+conseguir soluciones aún no exploradas (si es que existen). Dado que nuestro problema es encontrar una única solución, dicha constante es 1.
 Por esto es que el resultado final es una lista de listas de enteros, donde cada sublista representa una solución al problema.
 Por ejemplo, si tenemos como un resultado (un elemento de la lista) a la lista [1,3,0,2], esto significa que las posiciones de las reinas son:
 Reina1: fila 0 columna 1
@@ -45,7 +45,7 @@ def principal():
     print("\n")
     tablero=resolver(n)
     #mostrar(tablero,n)
-    guardar(tablero)
+    guardar(tablero,n)
 
 """
 resolver: int -> List[List[int]]
@@ -71,7 +71,7 @@ def ubicarReinas(res,visitados,reinas, restas, sumas, n):
     i = len(reinas)
     if i == n:
     #ya colocamos una reina en cada fila, se encontró una solución
-        res.append(reinas[:]) #se la agrega al resultado final
+        res.append(reinas) #se la agrega al resultado final
         return  #si se desean más soluciones, acá es donde se hace backtrack
         
     for j in range(n):
@@ -86,7 +86,7 @@ def ubicarReinas(res,visitados,reinas, restas, sumas, n):
             #para obtener una sola solución y no se haga backtrack para encontrar otras posibles. Se empieza a limpiar la pila con los estados anteriores
                 return res
             visitados[j] = False
-            reinas.pop() #saco la última agregada de la pila para intentar otro camino, vuelve al estado anterior e intenta con otra columna, si quedasen por probar aún
+            reinas.pop() #saco la última agregada para intentar otro camino, vuelve al estado anterior e intenta con otra columna, si quedasen por probar aún
                         #en la fila de dicho estado
             sumas.remove(i+j)
             restas.remove(i-j)
@@ -96,20 +96,27 @@ guardar: List[List[int]] -> None
 Función guardar: toma el tablero con la solución y la guarda 
 en el archivo tablero.txt de manera que en cada renglón, el primer número es la fila de la reina y el segundo la columna
 en la que está ubicada."""
-def guardar(tablero):
-    reinas = open("tablero.txt", "r+")
-    reinas.truncate(0)
+def guardar(tablero,n):
+    if os.path.exists("tablero.txt"):
+        reinas = open("tablero.txt", "r+")
+        reinas.truncate(0)
 
-    for res in tablero:
-        i=0
-        for fila in res:
-            print(i," ",fila)
-            reinas.write(str(i)+" "+str(fila))
-            reinas.write("\n")
-            i += 1
+        reinas.write(str(n))
+        reinas.write("\n")
 
-    reinas.close()
-    return
+        for res in tablero:
+            i=0
+            for fila in res:
+                #print(i," ",fila)
+                reinas.write(str(i)+" "+str(fila))
+                reinas.write("\n")
+                i += 1
+
+        reinas.close()
+        return
+    else:
+        print("El archivo tablero.txt no existe\n")
+        return
 
 
 """
